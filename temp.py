@@ -4,7 +4,7 @@ from PIL import Image
 import imageio
 
 input_z = tf.placeholder(
-	shape=(None, 8),
+	shape=(None, 2),
 	dtype=tf.float32,
 	name='input_z',
 )
@@ -48,8 +48,8 @@ outputs = tf.layers.dense(
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-range_x = [-150, 150]
-range_y = [-150, 150]
+range_x = [-100, 100]
+range_y = [-100, 100]
 
 x = np.arange(range_x[0], range_x[1] + .5, 1)
 y = np.arange(range_y[0], range_y[1] + .5, 1)
@@ -65,7 +65,7 @@ frames = 200
 for i in np.arange(frames):
 	# z = initial_z + (end_z - initial_z) * i / frames
 	z = np.array([np.cos(i*2*np.pi/frames), np.sin(i*2*np.pi/frames)]).reshape(1, 2)
-	z = np.concatenate([z, z, z, z], axis=1)
+	# z = np.concatenate([z, z, z, z], axis=1)
 	feed_dict = {
 		input_z: np.tile(z, (len(coordinates), 1)),
 		input_x: np.expand_dims(coordinates[:, 0], axis=1) / max(range_x),
@@ -83,4 +83,4 @@ for i in np.arange(frames):
 
 	# z += np.random.uniform(-delta, delta, size=(1, 8)).astype(np.float32)
 
-imageio.mimsave('samples/cppn.gif', images + images[::-1], duration=0.05)
+imageio.mimsave('cppn.gif', images, duration=0.05)
