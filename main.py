@@ -2,7 +2,6 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 import imageio
-from skimage import color, img_as_ubyte
 from absl import flags
 from absl import app
 from time import strftime
@@ -36,6 +35,7 @@ def main(unused_args):
 
 	z_dim = max(1, FLAGS.z)
 	if FLAGS.loop:
+		# See below on generating seamless loop
 		z_dim = max(2, z_dim)	
 
 	generator = CPPN(z_dim=z_dim, output_dim=len(FLAGS.type), scale=FLAGS.scale, units=FLAGS.units, use_r=FLAGS.use_r)
@@ -47,18 +47,21 @@ def main(unused_args):
 		height = FLAGS.height or FLAGS.size
 		width = FLAGS.width or FLAGS.size
 
+		# Set ranges so that center of image is [0, 0]
 		range_x = [-width // 2, width - width // 2 -1]
 		range_y = [-height // 2, height - height // 2 -1]
 
 		x = np.arange(range_x[0], range_x[1] + .5, 1)
 		y = np.arange(range_y[0], range_y[1] + .5, 1)
 
+		# Generate entire list of coordinates which will be passed to the model as a single batch
 		coordinates = np.array([[x[i], y[j]] for i in range(len(x)) for j in range(len(y))])
 		
 		if FLAGS.gif:
 			images = []
 			frames = FLAGS.frames
 			if FLAGS.loop:
+				# See below on generating seamless loop
 				if z_dim > 2:
 					initial_z = np.random.uniform(-1.0, 1.0, size=(1, z_dim - 2)).astype(np.float32)
 			else:
@@ -71,6 +74,7 @@ def main(unused_args):
 		for i in np.arange(frames):
 			if FLAGS.gif:
 				if FLAGS.loop:
+					# To get a nice seamless loop for the gif, we traverse a circle with two of the z dimensions
 					z = np.array([np.cos(i*2*np.pi/frames), np.sin(i*2*np.pi/frames)]).reshape(1, 2)
 					if z_dim > 2:
 						z = np.concatenate([z, initial_z], axis=1)

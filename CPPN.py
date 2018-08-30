@@ -34,6 +34,7 @@ class CPPN():
 		)
 
 		if self.use_r:
+			# Use a radius term to bias the output towards circular patterns
 			input_r = (self.input_x ** 2 + self.input_y **2) ** 0.5
 			inputs = tf.concat([self.input_z, self.input_x, self.input_y, input_r], axis=1)
 		else:
