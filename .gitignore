@@ -1,4 +1,5 @@
 sample_*.gif
+sample_*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
