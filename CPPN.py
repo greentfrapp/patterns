@@ -38,7 +38,7 @@ class CPPN():
 			input_r = (self.input_x ** 2 + self.input_y **2) ** 0.5
 			inputs = tf.concat([self.input_z, self.input_x, self.input_y, input_r], axis=1)
 		else:
-			inputs = tf.concat([self.input_z, self.input_x, self.input_y], axis=1)
+			inputs = tf.concat([self.input_z, self.input_x, self.input_y], axis=-1)
 
 		inputs *= self.scale
 
